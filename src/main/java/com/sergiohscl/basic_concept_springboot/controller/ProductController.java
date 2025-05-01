@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sergiohscl.basic_concept_springboot.Service.ProductService;
+import com.sergiohscl.basic_concept_springboot.data.dto.v1.ProductDTO;
 import com.sergiohscl.basic_concept_springboot.model.Product;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,7 +36,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> searchProduct(@PathVariable Long id) {
-        Product product = productservice.searchById(id);
+        ProductDTO product = productservice.searchById(id);
         return ResponseEntity.ok(product);
     }
 
@@ -46,14 +47,14 @@ public class ProductController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Product> createProduct(@RequestBody Product newProduct) {
-        Product saved = productservice.saveProduct(newProduct);
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO newProduct) {
+        ProductDTO saved = productservice.saveProduct(newProduct);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productUpdated)  {
-        Product updated  = productservice.updateProduct(id, productUpdated);      
+    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productUpdated)  {
+        ProductDTO updated  = productservice.updateProduct(id, productUpdated);      
         return ResponseEntity.ok(updated);
     }
     
