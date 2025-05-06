@@ -1,4 +1,5 @@
-# Basic Concept Spring Boot
+Basic Concept Spring Boot
+=========================
 
 Este projeto demonstra uma aplicação Spring Boot com **DTOs** na versão 1 (v1), organizados na estrutura:
 
@@ -71,3 +72,55 @@ Para versionar e aplicar evoluções de schema de forma segura e confiável, est
 A utilização do Flyway garante que todas as instâncias da aplicação apliquem as mesmas migrações na ordem correta, evitando inconsistências de schema.
 
 [Documentação oficial do Flyway](https://flywaydb.org/documentation)
+
+---
+
+## Java Persistence API (JPA)
+
+1. **Entidades mapeadas**
+   - Classes como `Product` e `User` usam `@Entity` e `@Table`, ligando-as a tabelas no banco.
+   - Chaves primárias com `@Id` e `@GeneratedValue(strategy = GenerationType.IDENTITY)` para auto-incremento.
+
+2. **Configuração no application.properties**
+   ```properties
+   spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+   spring.datasource.url=jdbc:postgresql://localhost:5432/dbsergio
+   spring.datasource.username=postgres
+   spring.datasource.password=admin13$
+   spring.jpa.hibernate.ddl-auto=none
+   ```
+   - Define o dialect do Hibernate, as credenciais de conexão e desativa recriação automática de schema.
+   - Flyway cuida das migrações iniciais (`V1__Create_Table_Product.sql`, etc.).
+
+3. **Repositórios**
+   - Interfaces `ProductRepository` e `UserRepository` estendem `JpaRepository`, fornecendo CRUD, paginação e filtros.
+   - Métodos customizados (ex.: `findByUsername`) suportam buscas específicas.
+
+4. **Serviços**
+   - `ProductService` e `UserService` usam os repositórios via injeção de dependência.
+   - Convertem entre entidades e DTOs, aplicam lógica de negócio e validam entradas.
+
+## Segurança (Spring Security + JWT)
+
+1. **SecurityConfig**
+   - Configura `SecurityFilterChain` para:
+     - Permitir acesso livre a `/auth/**`.
+     - Exigir autenticação em demais rotas.
+     - Estateless: `SessionCreationPolicy.STATELESS`.
+     - Registra `JwtAuthFilter` antes do filtro de autenticação padrão.
+   - Cria `AuthenticationManager` com `DaoAuthenticationProvider`, usando `UsersDetailsService` e `BCryptPasswordEncoder`.
+
+2. **JwtUtil**
+   - Gera e valida tokens JWT com **jjwt** (HS256, expiração em 24h).
+   - Métodos de criação (`generateToken`) e verificação (`validateToken`).
+
+3. **JwtAuthFilter**
+   - Filtro `OncePerRequestFilter` que:
+     1. Lê header `Authorization: Bearer <token>`.
+     2. Extrai username via `JwtUtil`.
+     3. Carrega `UserDetails` e valida token.
+     4. Preenche `SecurityContext` para autorizações.
+
+4. **Fluxo de autenticação**
+   - `AuthController` em `POST /auth/login` recebe credenciais e retorna `{ "token": "<jwt>" }`.
+   - Requisições subsequentes incluem o token no header, garantindo acesso a endpoints protegidos.
