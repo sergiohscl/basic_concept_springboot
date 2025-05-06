@@ -124,3 +124,36 @@ A utilização do Flyway garante que todas as instâncias da aplicação aplique
 4. **Fluxo de autenticação**
    - `AuthController` em `POST /auth/login` recebe credenciais e retorna `{ "token": "<jwt>" }`.
    - Requisições subsequentes incluem o token no header, garantindo acesso a endpoints protegidos.
+
+## Tratamento de Exceções
+
+1. **Motivação para usar exceptions**
+   - Exceções separam o fluxo principal do código do fluxo de erro, centralizando a lógica de tratamento e evitando verificações manuais extensas.
+
+2. **Customização de respostas HTTP**
+   - Classes de exceção específicas (`ResourceNotFoundException`, `BadRequestException`) permitem mapear cenários de erro a status HTTP adequados (404, 400) e mensagens claras.
+
+3. **Manutenção e legibilidade**
+   - Lançar exceções nos serviços (ex.: ao buscar entidade inexistente) torna o código mais limpo e fácil de entender, pois sinaliza imediatamente condições anômalas.
+
+4. **Integração com `@ControllerAdvice`**
+   - Um handler global (`GlobalExceptionHandler`) captura as exceções e converte em `ResponseEntity<ErrorResponse>`, garantindo consistência nas respostas de erro.
+
+### Exemplo de handler global
+```java
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("Recurso não encontrado", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        ErrorResponse error = new ErrorResponse("Requisição inválida", ex.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+}
+```
