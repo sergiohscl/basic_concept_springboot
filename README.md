@@ -157,3 +157,20 @@ public class GlobalExceptionHandler {
     }
 }
 ```
+
+---
+
+## Documentação da API com Swagger
+
+Este projeto inclui a documentação interativa da API utilizando o **Swagger UI**, facilitando o teste e visualização dos endpoints disponíveis.
+
+- 📘 **Swagger UI** permite explorar, testar e entender os endpoints da API diretamente pelo navegador.
+- 🔒 Integração com segurança JWT para testar endpoints protegidos com autenticação.
+
+### Acesse a documentação da API:
+
+🔗 [http://localhost:8080/swagger-ui/index.html#/](http://localhost:8080/swagger-ui/index.html#/)
+
+### Referência oficial:
+
+📚 [Documentação do Swagger](https://swagger.io/tools/swagger-ui/)

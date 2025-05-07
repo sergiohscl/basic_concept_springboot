@@ -42,9 +42,13 @@ public class ProductService {
         if (dto.getPrice() == null || dto.getPrice() < 0) {
             throw new ResourceBadRequestException("The price of the product must be ≥ 0.");
         }
+
+        dto.setId(null);
+
         Product saved = productRepository.save(toEntity(dto));
         return toDTO(saved);
     }
+    
 
     public ProductDTO updateProduct(Long id, ProductDTO dto) {
         logger.info("Updating one Product!");
