@@ -32,10 +32,12 @@ public class JwtAuthFilter extends OncePerRequestFilter{
     
         String header = request.getHeader("Authorization");
         String token = null, username = null;
-    
+
         if (header != null && header.startsWith("Bearer ")) {
-            token = header.substring(7);
-            username = JwtUtil.extractUsername(token);
+            token = header.substring(7).trim();
+            if (!token.isEmpty() && JwtUtil.validateToken(token)) {
+                username = JwtUtil.extractUsername(token);
+            }            
         }
     
         if (username != null
@@ -53,4 +55,13 @@ public class JwtAuthFilter extends OncePerRequestFilter{
         // **sempre** deixa a requisição seguir
         filterChain.doFilter(request, response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.equals("/auth/login") ||
+            path.startsWith("/swagger") ||
+            path.startsWith("/v3/api-docs");
+    }
+
 }
